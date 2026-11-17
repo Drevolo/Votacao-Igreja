@@ -51,3 +51,22 @@ export const supabase: SupabaseClient =
   createClient('https://placeholder.supabase.co', 'placeholder-anon-key', {
     auth: { persistSession: false, autoRefreshToken: false },
   })
+
+/**
+ * Cliente usado pela área do eleitor. Tem uma chave de armazenamento própria e
+ * não persiste sessão, garantindo que as chamadas públicas (get_voting_group,
+ * cast_vote) sejam sempre feitas como `anon`, mesmo que o administrador esteja
+ * logado no mesmo navegador.
+ */
+export const publicSupabase: SupabaseClient = createClient(
+  url ?? 'https://placeholder.supabase.co',
+  key ?? 'placeholder-anon-key',
+  {
+    auth: {
+      storageKey: 'votacao-igreja-public',
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+  },
+)

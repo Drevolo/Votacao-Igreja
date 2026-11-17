@@ -12,7 +12,7 @@ O e-mail é convertido em **HMAC** no banco e nunca é armazenado em texto puro.
 ## 1. Preparar o Supabase
 
 1. Crie um projeto gratuito em [supabase.com](https://supabase.com/).
-2. No **SQL Editor**, clique em *New query*, cole todo o conteúdo de [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql) e clique em **Run**.
+2. No **SQL Editor**, clique em *New query*, cole todo o conteúdo de [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql) e clique em **Run**. (Se você já tinha rodado uma versão anterior, rode também [`supabase/migrations/0002_public_rpc_grants.sql`](supabase/migrations/0002_public_rpc_grants.sql) — ele corrige as permissões das funções públicas de votação.)
 3. Em **Authentication → Users**, clique em **Add user → Create new user**:
    - informe o e-mail e a senha do administrador;
    - marque **Auto Confirm User**;

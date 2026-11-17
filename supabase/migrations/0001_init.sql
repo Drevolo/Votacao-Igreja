@@ -313,11 +313,13 @@ $$;
 -- -----------------------------------------------------------------------------
 -- Permissões de execução
 -- -----------------------------------------------------------------------------
+-- As funções públicas de votação precisam funcionar tanto para visitantes
+-- anônimos quanto para o ADM logado (que pode abrir o link no mesmo navegador).
 revoke all on function public.cast_vote(uuid, uuid, text) from public, anon, authenticated;
-grant execute on function public.cast_vote(uuid, uuid, text) to anon;
+grant execute on function public.cast_vote(uuid, uuid, text) to anon, authenticated;
 
 revoke all on function public.get_voting_group(text) from public, anon, authenticated;
-grant execute on function public.get_voting_group(text) to anon;
+grant execute on function public.get_voting_group(text) to anon, authenticated;
 
 revoke all on function public.get_group_results(uuid) from public, anon, authenticated;
 grant execute on function public.get_group_results(uuid) to authenticated;

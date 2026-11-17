@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Alert, Button, Card, Input, Label, Spinner } from '../components/ui'
-import { supabase } from '../lib/supabase'
+import { publicSupabase } from '../lib/supabase'
 import type { CastVoteResult, VotingGroup } from '../lib/types'
 import { errorMessage } from '../lib/utils'
 
@@ -29,12 +29,13 @@ export default function VotePage() {
     let active = true
     setLoading(true)
 
-    supabase
+    publicSupabase
       .rpc('get_voting_group', { p_slug: (slug ?? '').toLowerCase() })
       .then(({ data: payload, error }) => {
         if (!active) return
         if (error) {
-          setLoadError('Não foi possível carregar a votação. Verifique sua conexão.')
+          console.error('Falha ao carregar votação:', error)
+          setLoadError(`Não foi possível carregar a votação. ${error.message}`)
         } else if (!payload) {
           setLoadError('Link de votação não encontrado. Confira o QR Code ou o endereço recebido.')
         } else {
@@ -56,7 +57,7 @@ export default function VotePage() {
     setResult(null)
     setSubmitError(null)
 
-    const { data: payload, error } = await supabase.rpc('cast_vote', {
+    const { data: payload, error } = await publicSupabase.rpc('cast_vote', {
       p_group_id: data.group.id,
       p_candidate_id: selected,
       p_email: email.trim(),
