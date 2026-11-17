@@ -70,7 +70,9 @@ create table if not exists public.rounds (
 create table if not exists public.votes (
   id uuid primary key default gen_random_uuid(),
   round_id uuid not null references public.rounds(id) on delete cascade,
-  candidate_id uuid not null references public.candidates(id),
+  -- CASCADE permite excluir o grupo (e, portanto, seus candidatos e seções)
+  -- sem violar a FK quando já existirem votos registrados.
+  candidate_id uuid not null references public.candidates(id) on delete cascade,
   -- HMAC do e-mail normalizado. O e-mail original nunca é gravado.
   voter_hash text not null,
   created_at timestamptz not null default now(),

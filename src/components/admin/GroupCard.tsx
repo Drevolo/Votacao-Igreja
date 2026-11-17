@@ -262,8 +262,16 @@ export default function GroupCard({ group, onChanged }: Props) {
     if (!window.confirm(`Excluir o grupo "${group.name}" e todos os seus votos?`)) return
     await withBusy(async () => {
       const { error: deleteError } = await supabase.from('groups').delete().eq('id', group.id)
-      if (deleteError) setError(errorMessage(deleteError))
-      else onChanged()
+      if (deleteError) {
+        const details = errorMessage(deleteError)
+        setError(
+          /votes_candidate_id_fkey/i.test(details)
+            ? 'Execute a migração supabase/migrations/0004_votes_candidate_cascade.sql no Supabase para excluir grupos que já receberam votos.'
+            : details,
+        )
+        return
+      }
+      onChanged()
     })
   }
 
