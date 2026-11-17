@@ -17,7 +17,15 @@ function LoginForm() {
     setLoading(true)
     setError(null)
     const { error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
-    if (signInError) setError('E-mail ou senha incorretos.')
+    if (signInError) {
+      const details = signInError.message || ''
+      const invalidCredentials = /invalid login credentials|invalid email or password|email not confirmed/i.test(details)
+      setError(
+        invalidCredentials
+          ? 'E-mail ou senha incorretos.'
+          : `Não foi possível entrar: ${details || 'falha de conexão com o Supabase.'}`,
+      )
+    }
     setLoading(false)
   }
 
