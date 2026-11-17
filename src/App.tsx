@@ -44,7 +44,7 @@ export default function App() {
       </div>
 
       <footer className="border-t border-slate-200 bg-white py-5 text-center text-xs text-slate-400">
-        Votação da Igreja · Seu voto é anônimo. O e-mail é usado apenas para evitar duplicidade.
+        Votação da Igreja
       </footer>
     </div>
   )
