@@ -98,9 +98,6 @@ export default function VotePage() {
           {data.group.election_title}
         </span>
         <h1 className="mt-4 text-3xl font-black sm:text-4xl">Votação · {data.group.name}</h1>
-        <p className="mt-2 text-sm text-indigo-100">
-          Escolha apenas uma opção. Seu voto é anônimo e não será exibido a outros eleitores.
-        </p>
       </div>
 
       <div className="mt-6">
