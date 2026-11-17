@@ -19,9 +19,11 @@ O e-mail é convertido em **HMAC** no banco e nunca é armazenado em texto puro.
    - salve.
    - Não existe cadastro público: somente usuários criados aqui conseguem entrar no painel.
 4. Em **Project Settings → API**, copie:
-   - **Project URL** → `VITE_SUPABASE_URL`
+   - **Project URL** (ex.: `https://abcdefgh.supabase.co`) → `VITE_SUPABASE_URL`
    - **anon / public key** → `VITE_SUPABASE_ANON_KEY`
 
+> ⚠️ **Atenção às novas chaves da API do Supabase:** no front-end use somente a **anon/public key** (JWT começando com `eyJ...`) ou a **publishable key** (`sb_publishable_...`). **Nunca** use a **secret key** (`sb_secret_...`) — ela dá acesso administrativo e vazaria no JavaScript público. Se isso acontecer, revogue a chave em **Project Settings → API → Secret keys**.
+>
 > A chave anônima é pública por design. A proteção vem das policies RLS e das funções `SECURITY DEFINER` criadas na migration.
 
 ---

@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import ElectionCard from '../components/admin/ElectionCard'
 import { Alert, Button, Card, Input, Label, Spinner } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
-import { isConfigured, supabase } from '../lib/supabase'
+import { configIssue, isConfigured, supabase } from '../lib/supabase'
 import type { Election } from '../lib/types'
 import { errorMessage } from '../lib/utils'
 
@@ -179,8 +179,8 @@ export default function AdminPage() {
     return (
       <main className="mx-auto max-w-xl px-4 py-16">
         <Alert tone="amber">
-          Configure o Supabase antes de usar o painel. Copie <code>.env.example</code> para{' '}
-          <code>.env.local</code> e preencha a URL e a chave do projeto.
+          Configure o Supabase antes de usar o painel. {configIssue} Veja o README para obter a URL do
+          projeto e a chave <strong>anônima/publicável</strong> — nunca use a chave secreta no front-end.
         </Alert>
       </main>
     )

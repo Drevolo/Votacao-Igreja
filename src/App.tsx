@@ -2,13 +2,13 @@ import { Link, Route, Routes } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import AdminPage from './pages/AdminPage'
 import VotePage from './pages/VotePage'
-import { isConfigured } from './lib/supabase'
+import { configIssue, isConfigured } from './lib/supabase'
 
 function ConfigWarning() {
   return (
     <div className="bg-amber-50 border-b border-amber-200 px-4 py-3 text-center text-sm text-amber-900">
-      <strong>Configuração pendente:</strong> copie <code>.env.example</code> para{' '}
-      <code>.env.local</code> e preencha os dados do Supabase. Veja o README.
+      <strong>Configuração do Supabase pendente:</strong> {configIssue} Confira os secrets do repositório
+      e o README.
     </div>
   )
 }
