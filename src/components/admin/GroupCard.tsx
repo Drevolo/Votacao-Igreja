@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import QRCode from 'qrcode'
-import { Alert, Badge, Button, Input, Label } from '../ui'
+import { Alert, Badge, Button, Card, Input, Label } from '../ui'
 import ResultsPanel from './ResultsPanel'
 import { supabase } from '../../lib/supabase'
 import type { Candidate, Group, ResultRow, VoteRound } from '../../lib/types'
@@ -62,6 +62,7 @@ export default function GroupCard({ group, onChanged }: Props) {
   const [showResults, setShowResults] = useState(false)
   const [showQR, setShowQR] = useState(false)
   const [qr, setQr] = useState<string | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<Candidate | null>(null)
 
   useEffect(() => {
     setName(group.name)
@@ -84,7 +85,7 @@ export default function GroupCard({ group, onChanged }: Props) {
     ])
 
     if (candidateRes.error) setError(errorMessage(candidateRes.error))
-    else setCandidates(candidateRes.data ?? [])
+    else setCandidates((candidateRes.data ?? []).filter((candidate) => !candidate.archived))
 
     if (roundRes.error) setError(errorMessage(roundRes.error))
     else setRound((roundRes.data ?? [])[0] ?? null)
@@ -223,14 +224,36 @@ export default function GroupCard({ group, onChanged }: Props) {
     })
   }
 
-  async function deleteCandidate(candidate: Candidate) {
-    if (!window.confirm(`Excluir a opção "${candidate.name}"?`)) return
+  function askDeleteCandidate(candidate: Candidate) {
+    setError(null)
+    setNotice(null)
+    setPendingDelete(candidate)
+  }
+
+  async function confirmDeleteCandidate() {
+    if (!pendingDelete) return
+    const target = pendingDelete
+    setPendingDelete(null)
+
     await withBusy(async () => {
-      const { error: deleteError } = await supabase.from('candidates').delete().eq('id', candidate.id)
-      if (deleteError) {
-        setError('Não é possível excluir uma opção que já recebeu votos.')
+      // Exclusão lógica: apagar a linha quebraria a FK de votes e apagaria a
+      // apuração histórica. Arquivar remove a opção da cédula sem perder votos.
+      const { error: archiveError } = await supabase
+        .from('candidates')
+        .update({ archived: true })
+        .eq('id', target.id)
+
+      if (archiveError) {
+        const details = errorMessage(archiveError)
+        setError(
+          /archived/i.test(details)
+            ? 'Execute a migração supabase/migrations/0003_archive_candidates.sql no Supabase para ativar a exclusão de opções.'
+            : details,
+        )
         return
       }
+
+      setNotice(`A opção "${target.name}" foi removida. Os votos e resultados já registrados foram preservados.`)
       await load()
     })
   }
@@ -362,7 +385,7 @@ export default function GroupCard({ group, onChanged }: Props) {
                   key={candidate.id}
                   candidate={candidate}
                   onSave={(value) => saveCandidate(candidate, value)}
-                  onDelete={() => deleteCandidate(candidate)}
+                  onDelete={() => askDeleteCandidate(candidate)}
                 />
               ))}
             </div>
@@ -383,6 +406,33 @@ export default function GroupCard({ group, onChanged }: Props) {
 
       {error && <div className="mt-4"><Alert tone="rose">{error}</Alert></div>}
       {notice && <div className="mt-4"><Alert tone="green">{notice}</Alert></div>}
+
+      {pendingDelete && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-delete-title"
+        >
+          <Card className="w-full max-w-md p-6 shadow-xl">
+            <h3 id="confirm-delete-title" className="text-lg font-bold text-slate-900">
+              Remover esta opção?
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">
+              A opção <strong>{pendingDelete.name}</strong> será removida da cédula e não poderá mais receber
+              votos. Os votos já registrados e os resultados das seções anteriores serão preservados.
+            </p>
+            <div className="mt-6 flex justify-end gap-2">
+              <Button variant="secondary" onClick={() => setPendingDelete(null)} disabled={busy}>
+                Cancelar
+              </Button>
+              <Button variant="danger" onClick={confirmDeleteCandidate} loading={busy}>
+                Remover opção
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }

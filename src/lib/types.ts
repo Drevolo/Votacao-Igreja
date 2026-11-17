@@ -18,6 +18,7 @@ export type Candidate = {
   group_id: string
   name: string
   created_at: string
+  archived: boolean
 }
 
 export type VoteRound = {

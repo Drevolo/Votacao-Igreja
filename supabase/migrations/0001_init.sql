@@ -50,6 +50,8 @@ create table if not exists public.candidates (
   id uuid primary key default gen_random_uuid(),
   group_id uuid not null references public.groups(id) on delete cascade,
   name text not null,
+  -- Exclusão lógica: o nome sai da cédula, mas os votos históricos são preservados.
+  archived boolean not null default false,
   created_at timestamptz not null default now()
 );
 
@@ -204,7 +206,7 @@ as $$
     'candidates', coalesce((
       select jsonb_agg(jsonb_build_object('id', c.id, 'name', c.name) order by c.created_at)
       from public.candidates c
-      where c.group_id = g.id
+      where c.group_id = g.id and c.archived = false
     ), '[]'::jsonb)
   )
   from public.groups g
