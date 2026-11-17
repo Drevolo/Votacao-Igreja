@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Carregando...</title>
+  </head>
+  <body>
+    <script>
+      // GitHub Pages não conhece as rotas do React. Esta página "captura" a URL
+      // original, volta para o index.html e o main.tsx restaura o endereço.
+      (function () {
+        var path = window.location.pathname
+        var match = path.match(/^(.*?)(\/v\/[^/]+|\/admin)?\/?$/)
+        var base = (match && match[1]) || ''
+        sessionStorage.setItem('__redirect', path + window.location.search + window.location.hash)
+        window.location.replace(base + '/index.html')
+      })()
+    </script>
+  </body>
+</html>
