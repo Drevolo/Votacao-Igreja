@@ -66,6 +66,7 @@ export default function GroupCard({ group, onChanged }: Props) {
   const [duplicateOpen, setDuplicateOpen] = useState(false)
   const [dupName, setDupName] = useState('')
   const [dupSlug, setDupSlug] = useState('')
+  const [collapsed, setCollapsed] = useState(false)
 
   useEffect(() => {
     setName(group.name)
@@ -387,21 +388,30 @@ export default function GroupCard({ group, onChanged }: Props) {
                   {round ? `${round.number}º escrutínio · ${round.is_open ? 'aberto' : 'bloqueado'}` : 'bloqueado'}
                 </Badge>
               </div>
-              <p className="mt-1 break-all font-mono text-xs text-slate-500">{groupUrl(slug)}</p>
+              {!collapsed && <p className="mt-1 break-all font-mono text-xs text-slate-500">{groupUrl(slug)}</p>}
             </>
           )}
         </div>
 
         {!editing && (
           <div className="flex flex-wrap gap-2">
-            <Button variant="secondary" onClick={() => setEditing(true)}>Editar nomes</Button>
+            <Button
+              variant="secondary"
+              onClick={() => setCollapsed((value) => !value)}
+              aria-expanded={!collapsed}
+              aria-label={collapsed ? `Expandir grupo ${group.name}` : `Minimizar grupo ${group.name}`}
+            >
+              <span aria-hidden="true">{collapsed ? '▸' : '▾'}</span>
+              {collapsed ? 'Expandir' : 'Minimizar'}
+            </Button>
+            <Button variant="secondary" onClick={() => { setCollapsed(false); setEditing(true) }}>Editar nomes</Button>
             <Button variant="secondary" onClick={askDuplicate} disabled={busy}>Duplicar grupo</Button>
             <Button variant="ghost" onClick={deleteGroup} loading={busy}>Excluir</Button>
           </div>
         )}
       </div>
 
-      {!editing && (
+      {!editing && !collapsed && (
         <>
           <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
             <Button variant="secondary" onClick={copyLink}>Copiar link</Button>
