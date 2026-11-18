@@ -63,6 +63,9 @@ export default function GroupCard({ group, onChanged }: Props) {
   const [showQR, setShowQR] = useState(false)
   const [qr, setQr] = useState<string | null>(null)
   const [pendingDelete, setPendingDelete] = useState<Candidate | null>(null)
+  const [duplicateOpen, setDuplicateOpen] = useState(false)
+  const [dupName, setDupName] = useState('')
+  const [dupSlug, setDupSlug] = useState('')
 
   useEffect(() => {
     setName(group.name)
@@ -224,6 +227,55 @@ export default function GroupCard({ group, onChanged }: Props) {
     })
   }
 
+  function askDuplicate() {
+    setError(null)
+    setNotice(null)
+    setDupName(`${group.name} (cópia)`)
+    setDupSlug(`${group.slug}-copia`)
+    setDuplicateOpen(true)
+  }
+
+  async function confirmDuplicate() {
+    const cleanName = dupName.trim()
+    const cleanSlug = slugify(dupSlug)
+    if (!cleanName || !cleanSlug) {
+      setError('Informe um nome e um código de link válidos.')
+      return
+    }
+
+    setDuplicateOpen(false)
+    await withBusy(async () => {
+      const { data: created, error: insertError } = await supabase
+        .from('groups')
+        .insert({ election_id: group.election_id, name: cleanName, slug: cleanSlug })
+        .select('id')
+        .single()
+
+      if (insertError) {
+        const details = errorMessage(insertError)
+        setError(/duplicate key|unique/i.test(details) ? 'Esse código de link já está em uso. Escolha outro.' : details)
+        return
+      }
+
+      // Copia somente as opções ativas. O novo grupo não herda seções nem votos.
+      if (candidates.length > 0) {
+        const { error: candidatesError } = await supabase.from('candidates').insert(
+          candidates.map((candidate) => ({ group_id: created.id, name: candidate.name })),
+        )
+        if (candidatesError) {
+          await supabase.from('groups').delete().eq('id', created.id)
+          setError(errorMessage(candidatesError))
+          return
+        }
+      }
+
+      setNotice(
+        `Grupo "${cleanName}" criado com ${candidates.length} ${candidates.length === 1 ? 'opção' : 'opções'}. Votação bloqueada e sem votos.`,
+      )
+      onChanged()
+    })
+  }
+
   function askDeleteCandidate(candidate: Candidate) {
     setError(null)
     setNotice(null)
@@ -343,6 +395,7 @@ export default function GroupCard({ group, onChanged }: Props) {
         {!editing && (
           <div className="flex flex-wrap gap-2">
             <Button variant="secondary" onClick={() => setEditing(true)}>Editar nomes</Button>
+            <Button variant="secondary" onClick={askDuplicate} disabled={busy}>Duplicar grupo</Button>
             <Button variant="ghost" onClick={deleteGroup} loading={busy}>Excluir</Button>
           </div>
         )}
@@ -436,6 +489,64 @@ export default function GroupCard({ group, onChanged }: Props) {
               </Button>
               <Button variant="danger" onClick={confirmDeleteCandidate} loading={busy}>
                 Remover opção
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {duplicateOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="duplicate-title"
+        >
+          <Card className="w-full max-w-md p-6 shadow-xl">
+            <h3 id="duplicate-title" className="text-lg font-bold text-slate-900">Duplicar grupo</h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">
+              O novo grupo terá as mesmas opções de voto deste, mas começará sem votos e com a votação bloqueada.
+            </p>
+
+            <div className="mt-4 space-y-3">
+              <div>
+                <Label htmlFor="dup-name">Nome do novo grupo</Label>
+                <Input
+                  id="dup-name"
+                  autoFocus
+                  value={dupName}
+                  onChange={(event) => setDupName(event.target.value)}
+                  placeholder="Ex.: SAF — Vice-presidente"
+                />
+              </div>
+              <div>
+                <Label htmlFor="dup-slug">Código do link</Label>
+                <Input
+                  id="dup-slug"
+                  value={dupSlug}
+                  onChange={(event) => setDupSlug(event.target.value)}
+                  placeholder="saf-vice"
+                />
+                <p className="mt-1 break-all font-mono text-xs text-slate-500">{groupUrl(slugify(dupSlug))}</p>
+              </div>
+            </div>
+
+            {candidates.length > 0 && (
+              <div className="mt-4 rounded-xl bg-slate-50 px-3 py-2 text-xs leading-relaxed text-slate-600">
+                <strong>Opções que serão copiadas:</strong> {candidates.map((candidate) => candidate.name).join(', ')}
+              </div>
+            )}
+
+            <div className="mt-6 flex justify-end gap-2">
+              <Button variant="secondary" onClick={() => setDuplicateOpen(false)} disabled={busy}>
+                Cancelar
+              </Button>
+              <Button
+                onClick={confirmDuplicate}
+                loading={busy}
+                disabled={!dupName.trim() || !dupSlug.trim()}
+              >
+                Criar cópia
               </Button>
             </div>
           </Card>
