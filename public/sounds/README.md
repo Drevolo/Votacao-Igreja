@@ -10,12 +10,15 @@ Você pode escolher qual som será usado sem mexer no código.
 
 | Nome do arquivo | Prioridade | Observação |
 |---|---|---|
-| `confirm.mp3` | 1º (preferencial) | Se existir, é usado no lugar do `.wav` |
-| `confirm.wav` | 2º | Já vem pronto no projeto (sino curto) |
+| `confirm.m4a` | 1º | Som enviado para teste (áudio AAC em container MP4) |
+| `confirm.mp3` | 2º | Use se preferir MP3 |
+| `confirm.wav` | 3º | Som padrão do projeto (sino curto) |
 
 3. Faça commit e push para a branch `main` — o GitHub Pages publica automaticamente.
 
-Se os dois arquivos existirem, o `confirm.mp3` tem prioridade. Para voltar ao som padrão, apague o `confirm.mp3`.
+O primeiro arquivo da tabela que existir é usado. Para voltar ao som padrão, apague `confirm.m4a` e `confirm.mp3`.
+
+> O `confirm.m4a` atual tem também uma faixa de vídeo. O navegador toca apenas o áudio, mas se quiser um arquivo só de som, exporte o áudio do seu gravador como `.m4a` ou `.mp3` e substitua o arquivo.
 
 ## Dicas
 

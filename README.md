@@ -76,7 +76,7 @@ O `VITE_BASE_PATH` é preenchido automaticamente pelo workflow com `/<nome-do-re
 2. Se liberada, o eleitor informa o e-mail, escolhe uma opção e confirma.
 3. Se o e-mail já tiver votado naquela seção, recebe um aviso específico.
 4. Após confirmar, vê apenas a mensagem de sucesso — **nenhum resultado é exibido ao eleitor** — e um **som de confirmação** é tocado.
-5. Para escolher o som, basta colocar seu arquivo em [`public/sounds/`](public/sounds/) com o nome `confirm.mp3` (ou substituir o `confirm.wav` padrão). Instruções no `README.md` dessa pasta.
+5. Para escolher o som, basta colocar seu arquivo em [`public/sounds/`](public/sounds/) com o nome `confirm.m4a`, `confirm.mp3` ou substituir o `confirm.wav` padrão. Instruções no `README.md` dessa pasta.
 
 ---
 

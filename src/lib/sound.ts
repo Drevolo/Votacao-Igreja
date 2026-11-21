@@ -1,6 +1,6 @@
 // Som tocado quando o voto é registrado com sucesso.
 // Os arquivos ficam em public/sounds/ — veja o README dessa pasta para trocar.
-const SOUND_FILES = ['sounds/confirm.mp3', 'sounds/confirm.wav'] as const
+const SOUND_FILES = ['sounds/confirm.m4a', 'sounds/confirm.mp3', 'sounds/confirm.wav'] as const
 
 function assetUrl(file: string) {
   const base = import.meta.env.BASE_URL || '/'
