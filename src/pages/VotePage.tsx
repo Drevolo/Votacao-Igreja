@@ -4,6 +4,7 @@ import { Alert, Button, Card, Input, Label, Spinner } from '../components/ui'
 import { publicSupabase } from '../lib/supabase'
 import type { CastVoteResult, VotingGroup } from '../lib/types'
 import { errorMessage } from '../lib/utils'
+import { playVoteConfirmationSound } from '../lib/sound'
 
 const ERROR_MESSAGES: Record<string, string> = {
   closed: 'A votação deste grupo está bloqueada no momento. Aguarde o administrador liberar uma nova seção.',
@@ -66,7 +67,9 @@ export default function VotePage() {
     if (error) {
       setSubmitError(errorMessage(error))
     } else {
-      setResult(payload as CastVoteResult)
+      const voteResult = payload as CastVoteResult
+      setResult(voteResult)
+      if (voteResult?.ok) playVoteConfirmationSound()
     }
     setSubmitting(false)
   }
