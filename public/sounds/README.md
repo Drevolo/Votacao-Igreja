@@ -5,20 +5,21 @@ Você pode escolher qual som será usado sem mexer no código.
 
 ## Como trocar o som
 
-1. Escolha um arquivo de áudio pequeno (`.mp3` ou `.wav`).
+1. Escolha um arquivo de áudio pequeno (`.mp4`, `.m4a`, `.mp3` ou `.wav`).
 2. Coloque-o nesta pasta com um destes nomes:
 
 | Nome do arquivo | Prioridade | Observação |
 |---|---|---|
-| `confirm.m4a` | 1º | Som enviado para teste (áudio AAC em container MP4) |
-| `confirm.mp3` | 2º | Use se preferir MP3 |
-| `confirm.wav` | 3º | Som padrão do projeto (sino curto) |
+| `confirm.mp4` | 1º | Som atual enviado pelo administrador |
+| `confirm.m4a` | 2º | Áudio AAC em container MP4 |
+| `confirm.mp3` | 3º | Use se preferir MP3 |
+| `confirm.wav` | 4º | Sino curto padrão do projeto |
 
 3. Faça commit e push para a branch `main` — o GitHub Pages publica automaticamente.
 
-O primeiro arquivo da tabela que existir é usado. Para voltar ao som padrão, apague `confirm.m4a` e `confirm.mp3`.
+O primeiro arquivo da tabela que existir é usado. Para voltar ao sino padrão, crie um `confirm.wav` (o original está no histórico do Git) e apague os demais.
 
-> O `confirm.m4a` atual tem também uma faixa de vídeo. O navegador toca apenas o áudio, mas se quiser um arquivo só de som, exporte o áudio do seu gravador como `.m4a` ou `.mp3` e substitua o arquivo.
+> O `confirm.mp4` atual tem também uma faixa de vídeo. O navegador toca apenas o áudio, mas se quiser um arquivo só de som, exporte o áudio do seu gravador como `.m4a` ou `.mp3` e substitua o arquivo.
 
 ## Dicas
 
